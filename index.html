@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Contador 15:00</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+    background: #fff;
+    color: #000;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+
+  body {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2vh;
+    padding: 2vh 2vw;
+    overflow: hidden;
+  }
+
+  #contador {
+    color: #000;
+    background: #fff;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+    user-select: none;
+    text-align: center;
+    width: 100vw;
+    /* Gigante: ocupa casi toda la pantalla en desktop y mobile */
+    font-size: 26vw;
+    white-space: nowrap;
+  }
+
+  /* En vertical (mobile) usamos aún más grande */
+  @media (orientation: portrait) {
+    #contador {
+      font-size: 32vw;
+    }
+  }
+
+  /* En pantallas muy anchas ajustamos por alto para que quepa */
+  @media (orientation: landscape) {
+    #contador {
+      font-size: 38vh;
+    }
+  }
+
+  #contador.pasado {
+    color: #d00;
+  }
+
+  .botones {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .botones button {
+    font-size: 13px; /* botoncitos chiquitos */
+    padding: 6px 12px;
+    border: 1px solid #000;
+    background: #fff;
+    color: #000;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  .botones button:active {
+    background: #000;
+    color: #fff;
+  }
+</style>
+</head>
+<body>
+
+  <div id="contador">00:00</div>
+
+  <div class="botones">
+    <button id="btnIniciar">Iniciar</button>
+    <button id="btnParar">Parar</button>
+    <button id="btnReiniciar">Reiniciar</button>
+  </div>
+
+<script>
+  const LIMITE = 15 * 60; // 15 minutos en segundos
+  let transcurridos = 0;
+  let intervalo = null;
+
+  const el = document.getElementById('contador');
+  const btnIniciar = document.getElementById('btnIniciar');
+  const btnParar = document.getElementById('btnParar');
+  const btnReiniciar = document.getElementById('btnReiniciar');
+
+  function formato(s) {
+    s = Math.max(0, s);
+    const m = Math.floor(s / 60);
+    const seg = s % 60;
+    return String(m).padStart(2, '0') + ':' + String(seg).padStart(2, '0');
+  }
+
+  function pintar() {
+    el.textContent = formato(transcurridos);
+    if (transcurridos > LIMITE) {
+      el.classList.add('pasado');
+    } else {
+      el.classList.remove('pasado');
+    }
+  }
+
+  function tick() {
+    transcurridos++;
+    pintar();
+  }
+
+  function iniciar() {
+    if (intervalo !== null) return;
+    intervalo = setInterval(tick, 1000);
+    pintar();
+  }
+
+  function detener() {
+    if (intervalo !== null) {
+      clearInterval(intervalo);
+      intervalo = null;
+    }
+  }
+
+  function reiniciar() {
+    detener();
+    transcurridos = 0;
+    el.classList.remove('pasado');
+    pintar();
+  }
+
+  btnIniciar.addEventListener('click', iniciar);
+  btnParar.addEventListener('click', detener);
+  btnReiniciar.addEventListener('click', reiniciar);
+
+  pintar();
+</script>
+</body>
+</html>
